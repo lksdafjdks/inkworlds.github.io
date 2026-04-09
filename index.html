@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="description"
+    content="InkWorld 1.0: A Chinese Painting World Model with Long-Horizon Consistency" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InkWorld 1.0: A Chinese Painting World Model with Long-Horizon Consistency</title>
+
+  <!-- FONTS & STYLES -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <!-- <link rel="icon" href="static/images/logo.png"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .hero-ink {
+      position: relative;
+      height: 38vh;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(92, 84, 72, 0.16);
+      background:
+        radial-gradient(circle at 18% 28%, rgba(76, 66, 54, 0.14) 0%, rgba(76, 66, 54, 0) 32%),
+        radial-gradient(circle at 84% 20%, rgba(129, 105, 77, 0.16) 0%, rgba(129, 105, 77, 0) 34%),
+        radial-gradient(circle at 50% 82%, rgba(112, 101, 88, 0.10) 0%, rgba(112, 101, 88, 0) 38%),
+        linear-gradient(135deg, #f7f2e9 0%, #ede4d4 54%, #ddcfb8 100%);
+      box-shadow: inset 0 -28px 56px rgba(72, 63, 52, 0.06);
+    }
+
+    .hero-ink::before,
+    .hero-ink::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .hero-ink::before {
+      background:
+        radial-gradient(circle at -4% 44%, rgba(44, 39, 33, 0.24) 0%, rgba(44, 39, 33, 0) 22%),
+        radial-gradient(circle at 104% 26%, rgba(62, 55, 47, 0.20) 0%, rgba(62, 55, 47, 0) 20%),
+        radial-gradient(circle at 52% -10%, rgba(85, 75, 63, 0.14) 0%, rgba(85, 75, 63, 0) 28%),
+        radial-gradient(circle at 48% 112%, rgba(97, 86, 72, 0.16) 0%, rgba(97, 86, 72, 0) 24%);
+      opacity: 0.95;
+      mix-blend-mode: multiply;
+    }
+
+    .hero-ink::after {
+      background:
+        repeating-linear-gradient(0deg,
+          rgba(255, 255, 255, 0.06) 0px,
+          rgba(255, 255, 255, 0.06) 1px,
+          rgba(108, 96, 79, 0.035) 1px,
+          rgba(108, 96, 79, 0.035) 2px,
+          transparent 2px,
+          transparent 5px),
+        repeating-linear-gradient(90deg,
+          rgba(92, 82, 69, 0.025) 0px,
+          rgba(92, 82, 69, 0.025) 1px,
+          transparent 1px,
+          transparent 6px),
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 30%);
+      opacity: 0.5;
+      mix-blend-mode: multiply;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section class="hero hero-ink">
+    <div class="has-text-centered" style="position: relative; z-index: 1; width: 100%; padding: 0 1.5rem;">
+      <h1 class="title is-1"
+        style="font-size: 2.8rem; font-weight: 700; margin-bottom: 0.4rem; color: #2f2a24; letter-spacing: 1px;">
+        InkWorld 1.0</h1>
+      <p style="font-size: 1.2rem; color: #5e564a; margin-bottom: 0.3rem; font-weight: 400;">
+        A Chinese Painting World Model with Long-Horizon Consistency</p>
+      <p style="font-size: 1rem; color: #7a705f; margin-bottom: 0.8rem;">
+        <em>Anonymous Submission</em>
+      </p>
+      <p><!-- 这里要改 -->
+        <a href="https://github.com/inkworlds/inkworlds.github.io"
+          class="button is-dark is-small is-rounded"
+          style="border: 1px solid rgba(92, 84, 72, 0.22); background: rgba(47, 42, 36, 0.92); color: #f6f1e8;">
+          <span class="icon"><i class="fab fa-github"></i></span><span>GitHub</span>
+        </a><!-- 这里要改 -->
+      </p>
+    </div>
+  </section>
+
+
+
+  <!-- ABSTRACT -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-2 has-text-centered">Abstract</h2>
+
+      <!-- Abstract Text -->
+      <div class="content has-text-justified">
+        <p>
+          Traditional Chinese painting represents a unique visual expression system, 
+          characterized by a scattered perspective and compositional spatial organization, 
+          which often differs from the geometric assumptions of real-world scenes. Recent 
+          advances in generative video models have enabled Chinese paintings to come alive 
+          as dynamic, controllable visual content, a capability that is increasingly in demand. 
+          However, existing approaches often suffer from consistency issues, stemming from the 
+          lack of appropriate modeling of the underlying compositional structure and perspective 
+          principles in Chinese paintings. To this end, we propose <strong>InkWorld</strong>, a 
+          world model for consistent video generation for Chinese painting. Our key idea is to 
+          explicitly incorporate layer-wise compositional structures into the learning process 
+          without introducing additional architectural complexity. To achieve this, we decompose 
+          each training video into multiple semantic layers with both static structures and dynamic 
+          elements, and translate this decomposition into spatial weighting maps in the latent space. 
+          Based on this design, we introduce a layer-aware loss stratification mechanism, which reweights 
+          the velocity prediction objective to emphasize structurally stable regions and preserves dynamic 
+          expressiveness through mean normalization. In addition, we develop a unified control framework to 
+          jointly model camera motion and scene dynamics. Camera trajectories are represented using Plücker 
+          coordinates and integrated into Transformer attention, while motion-aware conditioning enables 
+          fine-grained temporal control across regions with varying dynamics. Our approach is model-agnostic 
+          and can be integrated into existing diffusion or flow-based video generation frameworks. 
+          The experimental analysis demonstrates that InkWorld effectively improves consistency for 
+          dynamic Chinese painting generation, providing a principled solution for modeling such a visual expression system.
+        </p>
+      </div>
+
+      <!-- Main Promotional Video -->
+      <div style="margin-top: 2rem;">
+        <video class="has-ratio" controls autoplay loop muted playsinline
+          style="width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+          <source src="static/videos/long_demo.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHOD OVERVIEW -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-2 has-text-centered">Brief Overview</h2>
+
+      <!-- Figure 1: System Overview Pipeline -->
+      <div class="box" style="margin-bottom: 2rem;">
+        <!-- <h3 class="title is-4">System Overview</h3> -->
+        <p class="has-text-justified" style="margin-bottom: 0.5rem;">
+          InkWorld 1.0 demonstrates consistent and controllable video generation for traditional 
+          Chinese paintings. By modeling layer-wise compositional structures and camera trajectories, 
+          our approach maintains long-horizon consistency in both static landscapes and dynamic elements.
+        </p>
+        <figure style="margin-top: 1rem;">
+          <img src="static/imgs/overview.png" alt="System Overview"
+            style="width: 100%; height: auto; border-radius: 8px;">
+          <figcaption style="color: #64748b; font-size: 0.85rem; margin-top: 0.4rem; text-align: center;">
+            <strong>Figure 1:</strong> Operating Instructions and Simple Effect Demonstration Figures of InkWorld 1.0 Model.
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- Figure 2: Interactive Base Model -->
+      <div class="box" style="margin-bottom: 2rem;">
+        <h3 class="title is-4">Layer-Stratified Consistency Loss</h3>
+        <p class="has-text-justified" style="margin-bottom: 0.5rem;">
+          The proposed Layer-Stratified Consistency Loss (LSCL) leverages the Layer
+           Curation Pipeline to extract structured priors, and constructs an adaptive 
+           weighting mask formed by the multiplicative combination of three independent components.
+        </p>
+        <figure style="margin-top: 1rem;">
+          <img src="static/imgs/structure.png" alt="Interactive Base Model"
+            style="width: 100%; height: auto; border-radius: 8px;">
+          <figcaption style="color: #64748b; font-size: 0.85rem; margin-top: 0.4rem; text-align: center;">
+            <strong>Figure 2:</strong> Visualization legend of motion score.
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- Figure 3: Dataset Overview -->
+      <div class="box" style="margin-bottom: 2rem;">
+        <h3 class="title is-4">Dataset Overview</h3>
+        <p class="has-text-justified" style="margin-bottom: 0.5rem;">
+          Representative examples from the InkWorld 1.0 dataset. We show both collected online videos and synthetic videos derived from digitized Chinese paintings. The samples cover diverse scene categories, camera traversal patterns, semantic layer structures, and dynamic score annotations used to construct the training supervision.
+        </p>
+        <figure style="margin-top: 1rem;">
+          <img src="static/imgs/tagging_sample.png" alt="Dataset Overview"
+            style="width: 100%; height: auto; border-radius: 8px;">
+          <figcaption style="color: #64748b; font-size: 0.85rem; margin-top: 0.4rem; text-align: center;">
+            <strong>Figure 3:</strong> Representative examples from the InkWorld 1.0 dataset.
+          </figcaption>
+        </figure>
+      </div>
+
+      <!-- Figure 5: Few-Step Distillation
+      <div class="box">
+        <h3 class="title is-4">Training–Inference Aligned Few-Step Distillation</h3>
+        <p class="has-text-justified" style="margin-bottom: 0.5rem;">
+          We introduce a <strong>multi-segment self-generated inference scheme</strong> for the bidirectional student,
+          based on Distribution Matching Distillation (DMD).
+          The student performs multi-segment rollouts that mimic actual few-step inference: each segment starts from
+          random noise, with past frames taken from the tail of the previous segment and memory retrieved from an
+          online-updated memory pool.
+          The final segment is used for distribution matching, thereby ensuring <strong>training–inference
+            consistency</strong>.
+        </p>
+        <p class="has-text-justified">
+          Combined with INT8 quantization for DiT attention layers, a lightweight pruned VAE decoder
+          (<strong>MG-LightVAE</strong>, up to 5.2× speedup), and GPU-based camera-aware memory retrieval, the full
+          pipeline achieves
+          <strong>up to 40 FPS real-time generation at 720p resolution</strong> using 8 GPUs for DiT inference and 1 GPU
+          for VAE decoding.
+        </p>
+        <figure style="margin-top: 1rem;">
+          <img src="static/imgs/distillation.png" alt="Few-Step Distillation"
+            style="width: 100%; height: auto; border-radius: 8px;">
+          <figcaption style="color: #64748b; font-size: 0.85rem; margin-top: 0.4rem; text-align: center;">
+            <strong>Figure 5:</strong> Illustration of the few-step distillation stage. The bidirectional student
+            performs multi-segment rollouts to mimic actual few-step inference, with the final segment used for
+            distribution matching.
+          </figcaption>
+        </figure>
+      </div> -->
+    </div>
+  </section>
+
+  <!-- VIDEO DEMOS -->
+  <section class="section"
+    style="background: linear-gradient(135deg, #1a1a2e 0%, #dccc8e 40%, #34495e 100%); position: relative; overflow: visible;">
+    <div class="container is-max-desktop has-text-centered">
+      <h2 class="title is-2" style="color: #f8f4ec;">Standard MSE</h2>
+      <p class="subtitle has-text-left" style="color: #f2ead9;">Baseline model trained with standard mean-squared error supervision.</p>
+      <div style="margin-top: 1.5rem;">
+        <div class="video-grid" id="videoContainer_svi_r1"></div>
+      </div>
+      <div style="margin-top: 1rem;">
+        <div class="video-grid" id="videoContainer_svi_r2"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop has-text-centered">
+      <h2 class="title is-2">InkWorld</h2>
+      <p class="subtitle has-text-left">InkWorld combines a rectified-flow video backbone with explicit camera and motion conditioning, together with a layer-stratified consistency loss. The conditional pathway addresses controllable viewpoint traversal, while the weighted objective anchors stable semantic layers during long-horizon generation.</p>
+
+      <!-- First-Person Sub-section -->
+      <!-- <div style="margin-top: 2rem;">
+        <h3 class="title is-4 has-text-left" style="margin-bottom: 0.25rem;">🎮 First-Person</h3>
+        <p class="has-text-left" style="color:#64748b; font-size:0.85rem; margin-bottom:0.5rem;">Current generation
+          window conditioned on memory frames from earlier.</p>
+        <div class="video-grid" id="videoContainer_mem_fp_r1"></div>
+      </div>
+      <div style="margin-top: 1rem;">
+        <h3 class="title is-4 has-text-left" style="margin-bottom: 0.25rem;"></h3>
+        <p class="has-text-left" style="color:#64748b; font-size:0.85rem; margin-bottom:0.5rem;"></p>
+        <div class="video-grid" id="videoContainer_mem_fp_r2"></div>
+      </div> -->
+
+      <!-- Third-Person Sub-section -->
+      <div style="margin-top: 2.5rem;">
+        <!-- <h3 class="title is-4 has-text-left" style="margin-bottom: 0.25rem;">🎬 Third-Person</h3> -->
+        <div class="video-grid" id="videoContainer_mem_tp_r1"></div>
+      </div>
+      <div style="margin-top: 1rem;">
+        <h3 class="title is-4 has-text-left" style="margin-bottom: 0.25rem;"></h3>
+        <div class="video-grid" id="videoContainer_mem_tp_r2"></div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ACK / CITATION -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3">Acknowledgement</h2>
+      <div class="content has-text-justified">
+
+        <p>We would like to express our gratitude to:</p>
+
+        <ul>
+          <li><a href="https://github.com/huggingface/diffusers">Diffusers</a> for their excellent diffusion model
+            framework</li>
+          <li><a href="https://github.com/Wan-Video/Wan2.2">Wan2.2</a> for their strong base model</li>
+          <li><a href="https://github.com/guandeh17/Self-Forcing">Self-Forcing</a> for their excellent work on
+            autoregressive generation</li>
+          <li><a href="https://github.com/KwaiVGI/GameFactory">GameFactory</a> for their idea of action control module
+          </li>
+          <li><a href="https://github.com/SkyworkAI/LightX2V">LightX2V</a> for their efficient quantization and VAE
+            distillation techniques</li>
+          <li><a href="https://github.com/YuxueYang1204/Layer-Curation-Pipeline">Layer-Curation-Pipeline</a> for providing the layer curation pipeline that enabled our semantic layer analysis</li>
+          <li>The broader research community for their contributions to Chinese painting generation and world modeling</li>
+        </ul>
+
+        <p>We are grateful to the broader research community for their open exploration and contributions to the field
+          of interactive world generation and traditional art digitization.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">Template adapted from <a href="https://nerfies.github.io/">NERFies</a>,
+        CC BY‑SA 4.0.</div>
+    </div>
+  </footer>
+
+  <!-- JS: Dynamic Video Loader -->
+  <style>
+    .video-scroll-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 16px;
+      margin-top: 20px;
+      padding-bottom: 12px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .video-scroll-container::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .video-scroll-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+
+    .video-scroll-container::-webkit-scrollbar-thumb {
+      background: #d6ab3e;
+      border-radius: 3px;
+    }
+
+    .video-scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #d3da14;
+    }
+
+    /* Two-row scroll container */
+    .video-scroll-container.two-rows {
+      flex-wrap: wrap;
+      height: auto;
+    }
+
+    .video-scroll-container.two-rows .video-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .video-card {
+      flex-shrink: 0;
+      width: 320px;
+      background: #f8fafc;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .video-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .video-card video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ── Plan A+C: Frame strip panel ── */
+    .frame-strip-panel {
+      background: #d0c30f;
+      padding: 6px;
+    }
+
+    /* Timeline strip (Plan C) */
+    .frame-timeline {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 4px;
+    }
+
+    .frame-timeline-item {
+      flex: 1;
+      position: relative;
+      cursor: default;
+    }
+
+    .frame-timeline-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 2px;
+      border: 1.5px solid transparent;
+    }
+
+    .frame-timeline-item.is-memory img {
+      border-color: #38bdf8;
+    }
+
+    .frame-timeline-item.is-current img {
+      border-color: #f59e0b;
+    }
+
+    .frame-timeline-item .ft-label {
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 3px #000;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* Plan A: Early vs Late comparison row */
+    .frame-compare {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .frame-compare-item {
+      flex: 1;
+      position: relative;
+    }
+
+    .frame-compare-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 3px;
+    }
+
+    .frame-compare-item .fc-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-align: center;
+      padding: 2px 0 1px;
+      letter-spacing: 0.03em;
+    }
+
+    .fc-label.fc-memory {
+      color: #38bdf8;
+    }
+
+    .fc-label.fc-current {
+      color: #f59e0b;
+    }
+  </style>
+  <script>
+    function createVideoCard(path) {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+
+      const video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'metadata';
+
+      const source = document.createElement('source');
+      source.src = path;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+
+      video.addEventListener('dblclick', function () {
+        if (video.requestFullscreen) video.requestFullscreen();
+        else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      });
+
+      video.addEventListener('error', function () {
+        card.innerHTML = `<div style="padding:20px;text-align:center;color:#721c24;"><strong>Video load failed</strong><br><small>${path}</small></div>`;
+      });
+
+      card.appendChild(video);
+      return card;
+    }
+
+    // Derive the frame image key from the video path
+    // e.g. 'static/videos/30s/031.mp4'  → '30s_031'
+    //      'static/videos/1min/091.mp4' → '1min_091'
+    //      'static/videos/tp_demo/video_lingbot-..._91_action.mp4' → 'tp_91'
+    function videoPathToKey(path) {
+      const parts = path.split('/');
+      const folder = parts[parts.length - 2];   // '30s', '1min', 'tp_demo'
+      const file = parts[parts.length - 1].replace('.mp4', '');
+      if (folder === 'tp_demo') {
+        // extract the number before '_action'
+        const m = file.match(/_([0-9]+)_action$/);
+        return m ? 'tp_' + m[1] : 'tp_' + file;
+      }
+      return folder + '_' + file;
+    }
+
+    // Plan A + C: video card with a 6-frame timeline strip and early/late comparison
+    function createFrameStripCard(path) {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+
+      // ── Standard video player ──
+      const video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'metadata';
+      const source = document.createElement('source');
+      source.src = path;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+      video.addEventListener('dblclick', () => {
+        if (video.requestFullscreen) video.requestFullscreen();
+        else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      });
+      video.addEventListener('error', () => {
+        card.innerHTML = `<div style="padding:12px;text-align:center;color:#721c24;">Video load failed<br><small>${path}</small></div>`;
+      });
+      card.appendChild(video);
+
+      const key = videoPathToKey(path);
+      const base = 'static/imgs/memory_frames/' + key;
+
+      // ── Plan C: Timeline strip (6 frames) ──
+      const panel = document.createElement('div');
+      panel.className = 'frame-strip-panel';
+
+      const timeline = document.createElement('div');
+      timeline.className = 'frame-timeline';
+
+      const N = 6;
+      // Frames 0 and 1 are memory refs (early), frame 5 is current
+      for (let i = 0; i < N; i++) {
+        const item = document.createElement('div');
+        item.className = 'frame-timeline-item';
+        if (i <= 1) item.classList.add('is-memory');
+        if (i === N - 1) item.classList.add('is-current');
+
+        const img = new Image();
+        img.src = `${base}_strip_${i}.jpg`;
+        img.alt = `t${i}`;
+        img.title = i <= 1 ? '📌 Memory Frame' : (i === N - 1 ? '🎬 Current' : '');
+        item.appendChild(img);
+
+        const lbl = document.createElement('span');
+        lbl.className = 'ft-label';
+        lbl.textContent = i <= 1 ? '📌' : (i === N - 1 ? '🎬' : '');
+        item.appendChild(lbl);
+
+        timeline.appendChild(item);
+      }
+      panel.appendChild(timeline);
+
+      // ── Plan A: Early vs Late comparison ──
+      const compare = document.createElement('div');
+      compare.className = 'frame-compare';
+
+      ['early', 'late'].forEach((type, idx) => {
+        const item = document.createElement('div');
+        item.className = 'frame-compare-item';
+
+        const img = new Image();
+        img.src = `${base}_${type}.jpg`;
+        img.alt = type;
+        item.appendChild(img);
+
+        const lbl = document.createElement('div');
+        lbl.className = 'fc-label ' + (idx === 0 ? 'fc-memory' : 'fc-current');
+        lbl.textContent = idx === 0 ? '📌 Memory Ref' : '🎬 Late Scene';
+        item.appendChild(lbl);
+
+        compare.appendChild(item);
+      });
+      panel.appendChild(compare);
+
+      card.appendChild(panel);
+      return card;
+    }
+
+    const videos_quick = [
+      'static/videos/quick/0.mp4',
+      'static/videos/quick/1.mp4',
+      'static/videos/quick/2.mp4',
+      'static/videos/quick/3.mp4',
+      'static/videos/quick/4.mp4',
+      'static/videos/quick/5.mp4',
+      'static/videos/quick/6.mp4',
+      'static/videos/quick/7.mp4',
+      'static/videos/quick/8.mp4',
+      'static/videos/quick/9.mp4',
+      'static/videos/quick/10.mp4',
+      'static/videos/quick/11.mp4',
+      'static/videos/quick/12.mp4',
+      'static/videos/quick/13.mp4'
+    ];
+
+    // Memory Model: First-Person (30s row1+row2, 1min row3)
+    const videos_mem_fp = [
+      // 30s first-person
+      'static/videos/30s/031.mp4',
+      'static/videos/30s/012.mp4',
+      'static/videos/30s/004.mp4',
+      'static/videos/30s/076.mp4',
+      'static/videos/30s/002.mp4',
+      'static/videos/30s/021.mp4',
+      'static/videos/30s/091.mp4',
+      'static/videos/30s/025.mp4',
+      // 1min first-person (row 3)
+      'static/videos/1min/091.mp4',
+      'static/videos/1min/094.mp4',
+      'static/videos/1min/097.mp4',
+      'static/videos/1min/000.mp4',
+      'static/videos/1min/001.mp4'
+    ];
+
+    // Memory Model: Third-Person
+    const videos_slow = [
+      'static/videos/slow/0.mp4',
+      'static/videos/slow/1.mp4',
+      'static/videos/slow/2.mp4',
+      'static/videos/slow/3.mp4',
+      'static/videos/slow/4.mp4',
+      'static/videos/slow/5.mp4',
+      'static/videos/slow/6.mp4',
+      'static/videos/slow/7.mp4',
+      'static/videos/slow/8.mp4',
+      'static/videos/slow/9.mp4',
+      'static/videos/slow/10.mp4',
+      'static/videos/slow/11.mp4',
+      'static/videos/slow/12.mp4',
+      'static/videos/slow/13.mp4'
+    ];
+
+    // SVI Base Model: split into two rows of 7
+    const videos_quick_r1 = videos_quick.slice(0, 7);
+    const videos_quick_r2 = videos_quick.slice(7);
+
+    // Memory FP: 30s row + 1min row (semantically split)
+    const videos_mem_fp_r1 = [
+      'static/videos/30s/031.mp4',
+      'static/videos/1min/091.mp4',
+      'static/videos/1min/094.mp4',
+      'static/videos/30s/021.mp4',
+      'static/videos/30s/010_2.mp4',
+      'static/videos/1min/000.mp4',
+      'static/videos/1min/001.mp4'
+    ];
+    const videos_mem_fp_r2 = [
+      'static/videos/30s/076.mp4',
+      'static/videos/30s/002.mp4',
+      'static/videos/1min/097.mp4',
+      'static/videos/30s/004.mp4',
+      'static/videos/30s/025.mp4',
+      'static/videos/30s/091.mp4',
+      'static/videos/30s/000.mp4',
+    ];
+
+    // Memory TP: split into two rows of 5
+    const videos_slow_r1 = videos_slow.slice(0, 5);
+    const videos_slow_r2 = videos_slow.slice(5);
+
+    const TWO_ROW_THRESHOLD = 6;
+
+    function initVideoWall() {
+      const sections = [
+        { containerId: 'videoContainer_svi_r1', videos: videos_quick_r1, singleRow: true },
+        { containerId: 'videoContainer_svi_r2', videos: videos_quick_r2, singleRow: true },
+        { containerId: 'videoContainer_mem_fp_r1', videos: videos_mem_fp_r1, singleRow: true, frameStrip: true },
+        { containerId: 'videoContainer_mem_fp_r2', videos: videos_mem_fp_r2, singleRow: true, frameStrip: false },
+        { containerId: 'videoContainer_mem_tp_r1', videos: videos_slow_r1, singleRow: true, frameStrip: false },
+        { containerId: 'videoContainer_mem_tp_r2', videos: videos_slow_r2, singleRow: true, frameStrip: false }
+      ];
+
+      sections.forEach(section => {
+        const container = document.getElementById(section.containerId);
+        if (!container) return;
+        container.innerHTML = '';
+
+        const vids = section.videos;
+
+        // Fixed-column grid layout (e.g. SVI 4x2)
+        if (section.fixedCols) {
+          container.style.display = 'grid';
+          container.style.gridTemplateColumns = `repeat(${section.fixedCols}, 1fr)`;
+          container.style.gap = '16px';
+          container.style.marginTop = '20px';
+          vids.forEach(path => {
+            const card = createVideoCard(path);
+            card.style.width = '100%';
+            container.appendChild(card);
+          });
+          return;
+        }
+
+        container.className = 'video-scroll-container';
+
+        if (vids.length > TWO_ROW_THRESHOLD && !section.singleRow) {
+          // Two-row layout: split videos into columns of 2
+          container.classList.add('two-rows');
+          const half = Math.ceil(vids.length / 2);
+          for (let i = 0; i < half; i++) {
+            const col = document.createElement('div');
+            col.className = 'video-column';
+            col.appendChild(createVideoCard(vids[i]));
+            if (i + half < vids.length) {
+              col.appendChild(createVideoCard(vids[i + half]));
+            }
+            container.appendChild(col);
+          }
+        } else {
+          // Single-row layout
+          vids.forEach(path => {
+            const card = section.frameStrip
+              ? createFrameStripCard(path)
+              : createVideoCard(path);
+            container.appendChild(card);
+          });
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initVideoWall);
+  </script>
+
+</body>
+
+</html>
